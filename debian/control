@@ -1,0 +1,30 @@
+Source: minios-dracut
+Section: utils
+Priority: optional
+Maintainer: crims0n <crims0n@minios.dev>
+Build-Depends: debhelper (>= 13)
+Standards-Version: 4.6.2
+Homepage: https://minios.dev
+
+Package: minios-dracut
+Architecture: all
+Depends: ${misc:Depends}, dracut-core, cpio
+Recommends: zstd
+Suggests: dracut-network
+Description: MiniOS dracut modules for initramfs generation
+ This package provides dracut modules and tools for building
+ MiniOS-compatible initramfs images using dracut.
+ .
+ It includes:
+  * mkdracut - script to build MiniOS initramfs with dracut
+  * 90minios - main MiniOS dracut module
+  * 99minios-cleanup - cleanup dracut module
+  * 90-minios.conf - configuration file for MiniOS
+ .
+ This package is required for rebuilding initramfs in installed
+ MiniOS systems that use dracut as the initramfs builder.
+ .
+ The mkdracut script is essential because it provides the --add-drivers
+ option which explicitly includes filesystem drivers (squashfs, overlay,
+ loop, zram, ext4, vfat, ntfs3, exfat) that are omitted by the minimal
+ dracut configuration to keep initramfs size small.

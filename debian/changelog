@@ -1,0 +1,12 @@
+minios-dracut (1.0.0-1) unstable; urgency=medium
+
+  * Initial release
+  * Add mkdracut script for building MiniOS initramfs
+  * Add 90minios dracut module with MiniOS-specific initialization
+  * Add 99minios-cleanup dracut module
+  * Add dracut configuration files (90-minios.conf)
+  * Include static binaries (busybox, blkid, mount helpers, etc.)
+  * Include livekitlib library for live system functionality
+  * Self-contained package with all required dependencies
+
+ -- crims0n <crims0n@minios.dev>  Tue, 07 Oct 2025 01:03:03 +0300
