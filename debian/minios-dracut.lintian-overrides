@@ -1,0 +1,17 @@
+# Static binaries are required for initramfs and are included for both i386 and amd64
+# Package is Architecture: all because it can be installed on both architectures,
+# but the binaries inside are architecture-specific
+minios-dracut: statically-linked-binary
+minios-dracut: arch-dependent-file-in-usr-share
+minios-dracut: arch-independent-package-contains-binary-or-object
+minios-dracut: embedded-library
+
+# Binary files without source - these are precompiled static binaries
+# from livekit-mos project, included for self-sufficiency
+minios-dracut: source-is-missing bin/*
+
+# livekitlib is sourced, not executed
+minios-dracut: script-not-executable [usr/share/minios-dracut/lib/livekitlib]
+
+# Initial release doesn't close any bugs
+minios-dracut: initial-upload-closes-no-bugs

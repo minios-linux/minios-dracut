@@ -1,0 +1,19 @@
+# Binary files are precompiled static binaries from livekit-mos project
+# Included for self-sufficiency - source code available in livekit-mos repository
+minios-dracut source: source-is-missing [bin/@mount.dynfilefs]
+minios-dracut source: source-is-missing [bin/@mount.httpfs2]
+minios-dracut source: source-is-missing [bin/@mount.ntfs-3g]
+minios-dracut source: source-is-missing [bin/blkid]
+minios-dracut source: source-is-missing [bin/busybox]
+minios-dracut source: source-is-missing [bin/e2fsck]
+minios-dracut source: source-is-missing [bin/eject]
+minios-dracut source: source-is-missing [bin/lsblk]
+minios-dracut source: source-is-missing [bin/mc]
+minios-dracut source: source-is-missing [bin/mke2fs]
+minios-dracut source: source-is-missing [bin/ncurses-menu]
+minios-dracut source: source-is-missing [bin/parted]
+minios-dracut source: source-is-missing [bin/partprobe]
+minios-dracut source: source-is-missing [bin/resize2fs]
+
+
+

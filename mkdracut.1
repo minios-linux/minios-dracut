@@ -1,0 +1,48 @@
+.TH MKDRACUT 1 "October 2025" "minios-dracut 1.0.0" "MiniOS Manual"
+.SH NAME
+mkdracut \- build MiniOS initramfs with dracut
+.SH SYNOPSIS
+.B mkdracut
+.RI [ options ]
+.I KERNEL_VERSION
+.SH DESCRIPTION
+.B mkdracut
+is a wrapper script around dracut that builds MiniOS-compatible initramfs images.
+It automatically includes essential filesystem drivers and MiniOS-specific modules.
+.PP
+This script is essential because it provides the --add-drivers option which explicitly
+includes filesystem drivers (squashfs, overlay, loop, zram, ext4, vfat, ntfs3, exfat)
+that are omitted by the minimal dracut configuration to keep initramfs size small.
+.SH OPTIONS
+.TP
+.I KERNEL_VERSION
+The kernel version for which to build the initramfs (e.g., 6.1.0-26-amd64)
+.SH ENVIRONMENT
+.TP
+.B MINIOS_CLOUD
+Set to "true" to include cloud/VM drivers (virtio, vmxnet3)
+.TP
+.B MINIOS_NETWORK
+Set to "true" to include network drivers
+.SH FILES
+.TP
+.I /etc/dracut.conf.d/90-minios.conf
+MiniOS dracut configuration file
+.TP
+.I /usr/lib/dracut/modules.d/90minios/
+MiniOS dracut module directory
+.TP
+.I /usr/share/minios-dracut/
+Static binaries and libraries used in initramfs
+.SH EXAMPLES
+.TP
+Build initramfs for kernel 6.1.0-26-amd64:
+.B mkdracut 6.1.0-26-amd64
+.TP
+Build with cloud drivers:
+.B MINIOS_CLOUD=true mkdracut 6.1.0-26-amd64
+.SH SEE ALSO
+.BR dracut (8),
+.BR dracut.conf (5)
+.SH AUTHOR
+crims0n <crims0n@minios.dev>

@@ -2,3 +2,9 @@
 
 %:
 	dh $@
+
+override_dh_strip:
+	dh_strip -X/usr/share/minios-dracut/bin/
+
+override_dh_dwz:
+	dh_dwz -X/usr/share/minios-dracut/bin/

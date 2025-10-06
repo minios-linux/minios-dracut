@@ -6,6 +6,7 @@ DRACUTDIR = $(PREFIX)/lib/dracut
 MODULESDIR = $(DRACUTDIR)/modules.d
 CONFDIR = /etc/dracut.conf.d
 DATADIR = $(PREFIX)/share/minios-dracut
+MANDIR = $(PREFIX)/share/man
 
 .PHONY: all install clean
 
@@ -15,6 +16,9 @@ all:
 install:
 	# Install mkdracut script
 	install -D -m 0755 mkdracut $(DESTDIR)$(BINDIR)/mkdracut
+	
+	# Install man page
+	install -D -m 0644 mkdracut.1 $(DESTDIR)$(MANDIR)/man1/mkdracut.1
 	
 	# Install 90minios module
 	install -d $(DESTDIR)$(MODULESDIR)/90minios
@@ -41,6 +45,7 @@ clean:
 
 uninstall:
 	rm -f $(DESTDIR)$(BINDIR)/mkdracut
+	rm -f $(DESTDIR)$(MANDIR)/man1/mkdracut.1
 	rm -rf $(DESTDIR)$(MODULESDIR)/90minios
 	rm -rf $(DESTDIR)$(MODULESDIR)/99minios-cleanup
 	rm -f $(DESTDIR)$(CONFDIR)/90-minios.conf
