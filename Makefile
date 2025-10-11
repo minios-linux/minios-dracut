@@ -27,6 +27,7 @@ install:
 	install -m 0755 90minios/minios-mount-root.sh $(DESTDIR)$(MODULESDIR)/90minios/
 	install -m 0755 90minios/minios-shutdown.sh $(DESTDIR)$(MODULESDIR)/90minios/
 	install -m 0755 90minios/minios-init $(DESTDIR)$(MODULESDIR)/90minios/
+	install -m 0755 90minios/systemd-udevd-wrapper $(DESTDIR)$(MODULESDIR)/90minios/
 	
 	# Install 99minios-cleanup module
 	install -d $(DESTDIR)$(MODULESDIR)/99minios-cleanup

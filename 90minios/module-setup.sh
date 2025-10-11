@@ -14,25 +14,24 @@ depends() {
 install() {
     inst_hook cmdline 30 "$moddir/parse-minios.sh"
     inst_hook mount 30 "$moddir/minios-mount-root.sh"
-    inst_hook shutdown 30 "$moddir/minios-shutdown.sh"
+    inst_hook shutdown 20 "$moddir/minios-shutdown.sh"
     inst_script "$moddir/minios-init" "/minios-init"
 
-    # Find static binaries directory - prefer system-wide installation
+    # Set static binaries directory
     local STATIC_BIN=""
-    
+
     if [ -d "/usr/share/minios-dracut/bin" ]; then
         STATIC_BIN="/usr/share/minios-dracut/bin"
-    elif [ -d "${moddir}/../bin" ]; then
-        STATIC_BIN="${moddir}/../bin"
     fi
 
     if [ -z "$STATIC_BIN" ] || [ ! -x "$STATIC_BIN/busybox" ]; then
         derror "CRITICAL: Static binaries directory not found!"
-        derror "Expected location: /usr/share/minios-dracut/bin"
+        derror "Expected location:"
+        derror "  - /usr/share/minios-dracut/bin"
         return 1
     fi
 
-    dinfo "Found static binaries at: $STATIC_BIN"
+    dinfo "*** Found static binaries at: $STATIC_BIN"
 
     # Install essential static binaries for initramfs
     inst_simple "$STATIC_BIN/busybox" "/bin/busybox"
@@ -61,7 +60,8 @@ install() {
 
     if [ -z "$LIVEKITLIB_SRC" ] || [ ! -f "$LIVEKITLIB_SRC" ]; then
         derror "CRITICAL: livekitlib not found!"
-        derror "Expected location: /usr/share/minios-dracut/lib/livekitlib"
+        derror "Expected location:"
+        derror "  - /usr/share/minios-dracut/lib/livekitlib"
         return 1
     fi
 
@@ -83,12 +83,11 @@ install() {
         echo "NAME=MiniOS"
         echo "ID=minios"
         echo "PRETTY_NAME=\"MiniOS Linux\""
-    } > "${initdir}/etc/initrd-release"
+    } >"${initdir}/etc/initrd-release"
 
     # Install terminfo
     local TERMINFO_PATHS=(
         "/usr/share/minios-dracut/usr/share/terminfo/l/linux"
-        "${moddir}/../usr/share/terminfo/l/linux"
         "/usr/share/terminfo/l/linux"
     )
 
@@ -99,7 +98,7 @@ install() {
         fi
     done
 
-    inst_dir /lib/live/mount/{changes,medium,bundles,overlay}
+    inst_dir /memory/{changes,data,bundles,overlay}
 
     # Create busybox symlinks
     "${initdir}/bin/busybox" | grep , | grep -v Copyright | tr "," " " | while read LINE; do
@@ -113,6 +112,15 @@ install() {
     ln -sf busybox "${initdir}/bin/sh"
     ln -sf busybox "${initdir}/bin/ash"
 
+    # Wrap systemd-udevd to suppress version message
+    if [ -f /usr/lib/systemd/systemd-udevd ]; then
+        # Install real udevd binary with .real suffix
+        inst_simple /usr/lib/systemd/systemd-udevd /usr/lib/systemd/systemd-udevd.real
+        # Install wrapper script that suppresses stderr
+        inst_simple "$moddir/systemd-udevd-wrapper" /usr/lib/systemd/systemd-udevd
+        chmod 755 "${initdir}/usr/lib/systemd/systemd-udevd"
+    fi
+
     return 0
 }
 
@@ -123,30 +131,30 @@ installkernel() {
     instmods ext2 ext3 ext4 fat vfat ntfs ntfs3 exfat
     instmods isofs fuse efivarfs btrfs xfs
     instmods nls_cp437 nls_iso8859-1 nls_utf8
-    
+
     # Compression and checksums
     instmods =crypto/lz4 =crypto/zstd
     instmods crc32c crc32c-intel crc32-pclmul crc32c_generic
-    
+
     # Block devices
     instmods nbd dm-mod
     instmods =drivers/block/zram =drivers/block/loop
     instmods =drivers/staging/zsmalloc
-    
+
     # USB support
     instmods =drivers/usb/storage =drivers/usb/host
     instmods =drivers/usb/common =drivers/usb/core
     instmods =drivers/hid/usbhid
     instmods hid hid-generic uhid
-    
+
     # Storage controllers
     instmods =drivers/cdrom
     instmods sr_mod sd_mod scsi_mod sg
     instmods =drivers/ata =drivers/nvme =drivers/mmc
-    
+
     # Hyper-V
     instmods hv_storvsc
-    
+
     # Cloud/VM support
     if [ "$MINIOS_CLOUD" = "true" ]; then
         instmods virtio virtio_mmio virtio_pci virtio_ring
@@ -154,21 +162,21 @@ installkernel() {
         instmods virtio_blk virtio_scsi
         instmods vmw_pvscsi
     fi
-    
+
     # Network support
     if [ "$MINIOS_NETWORK" = "true" ]; then
         instmods =drivers/net/ethernet
         instmods =drivers/net/phy
-        
+
         # Cloud network drivers
         if [ "$MINIOS_CLOUD" = "true" ]; then
             instmods =drivers/net/vmxnet3
             instmods virtio_net
         fi
     fi
-    
+
     # DKMS modules
     instmods ntfs3
-    
+
     return 0
 }

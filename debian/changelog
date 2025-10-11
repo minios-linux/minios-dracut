@@ -1,3 +1,12 @@
+minios-dracut (1.0.2-1) unstable; urgency=medium
+
+  * Refactor MiniOS dracut module:
+    - update shutdown handling
+    - improve cleanup
+    - add systemd-udevd wrapper
+
+ -- crims0n <crims0n@minios.dev>  Sat, 11 Oct 2025 18:38:20 +0300
+
 minios-dracut (1.0.1-1) unstable; urgency=medium
 
   * Add minios-shutdown.sh script to handle clean shutdowns

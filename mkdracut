@@ -107,7 +107,6 @@ DRACUT_CMD=(
     dracut
     --force
     --kver "$KERNEL"
-    --add "minios minios-cleanup"
     --add-drivers "$AVAILABLE_DRIVERS"
     --strip
     --hardlink
