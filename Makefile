@@ -35,12 +35,6 @@ install:
 	
 	# Install configuration files
 	install -D -m 0644 90-minios.conf $(DESTDIR)$(CONFDIR)/90-minios.conf
-	
-	# Install livekit binaries and libraries
-	install -d $(DESTDIR)$(DATADIR)/bin
-	install -m 0755 bin/* $(DESTDIR)$(DATADIR)/bin/
-	install -D -m 0644 lib/livekitlib $(DESTDIR)$(DATADIR)/lib/livekitlib
-	install -D -m 0644 usr/share/terminfo/l/linux $(DESTDIR)$(DATADIR)/usr/share/terminfo/l/linux
 
 clean:
 	@echo "Nothing to clean."

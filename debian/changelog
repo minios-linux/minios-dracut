@@ -1,3 +1,14 @@
+minios-dracut (1.0.3) unstable; urgency=medium
+
+  * Major cleanup and refactor:
+    - Remove all bundled binaries, livekitlib, and terminfo from package
+    - All required files now sourced from /run/initramfs of running system
+    - Update module-setup.sh to use /run/initramfs paths for binaries,
+      livekitlib, terminfo
+    - Remove installation logic for removed files from Makefile
+
+ -- crims0n <crims0n@minios.dev>  Sun, 12 Oct 2025 03:25:16 +0300
+
 minios-dracut (1.0.2) unstable; urgency=medium
 
   * Refactor MiniOS dracut module:

@@ -17,51 +17,54 @@ install() {
     inst_hook shutdown 20 "$moddir/minios-shutdown.sh"
     inst_script "$moddir/minios-init" "/minios-init"
 
-    # Set static binaries directory
+    # Set binaries directory - prefer /run/initramfs from running system
     local STATIC_BIN=""
 
-    if [ -d "/usr/share/minios-dracut/bin" ]; then
-        STATIC_BIN="/usr/share/minios-dracut/bin"
+    if [ -d "/run/initramfs/bin" ]; then
+        STATIC_BIN="/run/initramfs/bin"
     fi
 
     if [ -z "$STATIC_BIN" ] || [ ! -x "$STATIC_BIN/busybox" ]; then
-        derror "CRITICAL: Static binaries directory not found!"
-        derror "Expected location:"
-        derror "  - /usr/share/minios-dracut/bin"
+        derror "CRITICAL: Binaries not found in /run/initramfs!"
+        derror "Expected location: /run/initramfs/bin"
         return 1
     fi
 
-    dinfo "*** Found static binaries at: $STATIC_BIN"
+    dinfo "*** Found binaries at: $STATIC_BIN"
 
-    # Install essential static binaries for initramfs
+    # Install essential binaries from /run/initramfs
     inst_simple "$STATIC_BIN/busybox" "/bin/busybox"
-    inst_simple "$STATIC_BIN/eject" "/bin/eject"
-    inst_simple "$STATIC_BIN/mke2fs" "/bin/mke2fs"
-    inst_simple "$STATIC_BIN/resize2fs" "/bin/resize2fs"
-    inst_simple "$STATIC_BIN/e2fsck" "/bin/e2fsck"
-    inst_simple "$STATIC_BIN/mc" "/bin/mc"
-    inst_simple "$STATIC_BIN/blkid" "/bin/blkid"
-    inst_simple "$STATIC_BIN/lsblk" "/bin/lsblk"
-    inst_simple "$STATIC_BIN/parted" "/bin/parted"
-    inst_simple "$STATIC_BIN/partprobe" "/bin/partprobe"
-    inst_simple "$STATIC_BIN/ncurses-menu" "/bin/ncurses-menu"
-    inst_simple "$STATIC_BIN/@mount.httpfs2" "/bin/@mount.httpfs2"
-    inst_simple "$STATIC_BIN/@mount.ntfs-3g" "/bin/@mount.ntfs-3g"
-    inst_simple "$STATIC_BIN/@mount.dynfilefs" "/bin/@mount.dynfilefs"
+    [ -x "$STATIC_BIN/eject" ] && inst_simple "$STATIC_BIN/eject" "/bin/eject"
+    [ -x "$STATIC_BIN/mke2fs" ] && inst_simple "$STATIC_BIN/mke2fs" "/bin/mke2fs"
+    [ -x "$STATIC_BIN/resize2fs" ] && inst_simple "$STATIC_BIN/resize2fs" "/bin/resize2fs"
+    [ -x "$STATIC_BIN/e2fsck" ] && inst_simple "$STATIC_BIN/e2fsck" "/bin/e2fsck"
+    [ -x "$STATIC_BIN/mc" ] && inst_simple "$STATIC_BIN/mc" "/bin/mc"
+    [ -x "$STATIC_BIN/blkid" ] && inst_simple "$STATIC_BIN/blkid" "/bin/blkid"
+    [ -x "$STATIC_BIN/lsblk" ] && inst_simple "$STATIC_BIN/lsblk" "/bin/lsblk"
+    [ -x "$STATIC_BIN/parted" ] && inst_simple "$STATIC_BIN/parted" "/bin/parted"
+    [ -x "$STATIC_BIN/partprobe" ] && inst_simple "$STATIC_BIN/partprobe" "/bin/partprobe"
+    [ -x "$STATIC_BIN/ncurses-menu" ] && inst_simple "$STATIC_BIN/ncurses-menu" "/bin/ncurses-menu"
+    [ -x "$STATIC_BIN/@mount.httpfs2" ] && inst_simple "$STATIC_BIN/@mount.httpfs2" "/bin/@mount.httpfs2"
+    [ -x "$STATIC_BIN/@mount.ntfs-3g" ] && inst_simple "$STATIC_BIN/@mount.ntfs-3g" "/bin/@mount.ntfs-3g"
+    [ -x "$STATIC_BIN/@mount.dynfilefs" ] && inst_simple "$STATIC_BIN/@mount.dynfilefs" "/bin/@mount.dynfilefs"
 
-    # Find and install livekitlib
+    # Install minios-boot if available
+    [ -x "$STATIC_BIN/minios-boot" ] && inst_simple "$STATIC_BIN/minios-boot" "/bin/minios-boot"
+
+    # Find and install livekitlib from /run/initramfs
     local LIVEKITLIB_SRC=""
 
-    if [ -f "/usr/share/minios-dracut/lib/livekitlib" ]; then
-        LIVEKITLIB_SRC="/usr/share/minios-dracut/lib/livekitlib"
-    elif [ -f "${moddir}/../lib/livekitlib" ]; then
-        LIVEKITLIB_SRC="${moddir}/../lib/livekitlib"
+    if [ -f "/run/initramfs/usr/lib/livekitlib" ]; then
+        LIVEKITLIB_SRC="/run/initramfs/usr/lib/livekitlib"
+    elif [ -f "/run/initramfs/lib/livekitlib" ]; then
+        LIVEKITLIB_SRC="/run/initramfs/lib/livekitlib"
     fi
 
     if [ -z "$LIVEKITLIB_SRC" ] || [ ! -f "$LIVEKITLIB_SRC" ]; then
         derror "CRITICAL: livekitlib not found!"
-        derror "Expected location:"
-        derror "  - /usr/share/minios-dracut/lib/livekitlib"
+        derror "Expected locations:"
+        derror "  - /run/initramfs/usr/lib/livekitlib"
+        derror "  - /run/initramfs/lib/livekitlib"
         return 1
     fi
 
@@ -72,10 +75,7 @@ install() {
         return 1
     fi
 
-    # Install minios-boot if available
-    if [ -x "$STATIC_BIN/minios-boot" ]; then
-        inst_simple "$STATIC_BIN/minios-boot" "/bin/minios-boot"
-    fi
+    dinfo "*** Installed livekitlib from: $LIVEKITLIB_SRC"
 
     [ -f /etc/minios-release ] && inst_simple /etc/minios-release /etc/minios-release
 
@@ -85,15 +85,16 @@ install() {
         echo "PRETTY_NAME=\"MiniOS Linux\""
     } >"${initdir}/etc/initrd-release"
 
-    # Install terminfo
+    # Install terminfo from /run/initramfs
     local TERMINFO_PATHS=(
-        "/usr/share/minios-dracut/usr/share/terminfo/l/linux"
+        "/run/initramfs/usr/share/terminfo/l/linux"
         "/usr/share/terminfo/l/linux"
     )
 
     for TERMPATH in "${TERMINFO_PATHS[@]}"; do
         if [ -f "$TERMPATH" ]; then
             inst_simple "$TERMPATH" "/usr/share/terminfo/l/linux"
+            dinfo "*** Installed terminfo from: $TERMPATH"
             break
         fi
     done
