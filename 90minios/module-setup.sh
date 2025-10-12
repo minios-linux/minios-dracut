@@ -15,7 +15,16 @@ install() {
     inst_hook cmdline 30 "$moddir/parse-minios.sh"
     inst_hook mount 30 "$moddir/minios-mount-root.sh"
     inst_hook shutdown 20 "$moddir/minios-shutdown.sh"
-    inst_script "$moddir/minios-init" "/minios-init"
+
+    # Install minios-init from /run/initramfs
+    if [ -f "/run/initramfs/minios-init" ]; then
+        inst_simple "/run/initramfs/minios-init" "/minios-init"
+        chmod 755 "${initdir}/minios-init"
+        dinfo "*** Installed minios-init from /run/initramfs"
+    else
+        derror "CRITICAL: minios-init not found in /run/initramfs!"
+        return 1
+    fi
 
     # Set binaries directory - prefer /run/initramfs from running system
     local STATIC_BIN=""
@@ -98,6 +107,13 @@ install() {
             break
         fi
     done
+
+    # Install mkdracut from /run/initramfs
+    if [ -f "/run/initramfs/mkdracut" ]; then
+        inst_simple "/run/initramfs/mkdracut" "/mkdracut"
+        chmod 755 "${initdir}/mkdracut"
+        dinfo "*** Installed mkdracut from /run/initramfs"
+    fi
 
     inst_dir /memory/{changes,data,bundles,overlay}
 

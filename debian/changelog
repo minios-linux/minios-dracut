@@ -1,3 +1,10 @@
+minios-dracut (1.0.4) unstable; urgency=medium
+
+  * Remove minios-init and mkdracut scripts
+  * Update module-setup.sh for improved installation handling
+
+ -- crims0n <crims0n@minios.dev>  Sun, 12 Oct 2025 17:53:23 +0300
+
 minios-dracut (1.0.3) unstable; urgency=medium
 
   * Major cleanup and refactor:
