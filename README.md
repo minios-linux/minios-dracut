@@ -1,8 +1,10 @@
 # MiniOS Dracut
 
+## Overview
+
 Dracut modules and tools for building MiniOS-compatible initramfs images.
 
-## Contents
+## Components
 
 - **mkdracut** - Script to build MiniOS initramfs
 - **90minios** - Core MiniOS dracut module
